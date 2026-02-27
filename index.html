@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="Pro.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Book</title>
+  <!-- Font & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #f0f4fe;  /* soft background like many modern apps */
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    /* main container — authentic app card with bottom bar feel */
+    .app-screen {
+      width: 100%;
+      max-width: 400px;  /* typical mobile width */
+      background: #ffffff;
+      border-radius: 40px 40px 30px 30px;
+      box-shadow: 0 30px 50px rgba(0, 10, 30, 0.15), 0 0 0 1px rgba(155, 180, 215, 0.3);
+      overflow: hidden;
+      backdrop-filter: blur(0);
+      transition: transform 0.2s;
+    }
+
+    /* dynamic card content (used for both login / main) */
+    .panel {
+      padding: 28px 24px 34px 24px;
+      background: white;
+    }
+
+    /* header with gradient exactly like many ios/android apps */
+    .app-header {
+      background: linear-gradient(135deg, #0b2b44, #1f4b6e);
+      padding: 28px 24px 20px 24px;
+      color: white;
+    }
+    .app-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-header h1 i {
+      background: rgba(255,255,255,0.2);
+      padding: 10px;
+      border-radius: 18px;
+      font-size: 26px;
+    }
+    .app-header .greet {
+      font-size: 16px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* floating logout button inside header (clean) */
+    .logout-wrap {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-size: 15px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(4px);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* modern input card style */
+    .input-card {
+      background: #f8faff;
+      border-radius: 28px;
+      padding: 8px 8px 8px 20px;
+      display: flex;
+      align-items: center;
+      margin: 24px 0 20px 0;
+      border: 1px solid #eef3fd;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .input-card input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 16px 8px 16px 0;
+      font-size: 16px;
+      font-weight: 500;
+      outline: none;
+    }
+    .input-card button {
+      background: #1d3a5c;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 14px 22px;
+      border-radius: 40px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 18px -6px #0f2e4a;
+      cursor: pointer;
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+    .input-card button i { font-size: 16px; }
+    .input-card button:hover { background: #264e78; }
+
+    /* stats badge */
+    .stat-badge {
+      background: #ecf2fc;
+      border-radius: 60px;
+      padding: 12px 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: #1d3853;
+      margin-bottom: 24px;
+      border: 1px solid white;
+      font-size: 15px;
+    }
+    .stat-badge i { color: #1f4b6e; }
+
+    /* list items — super clean, like notes app */
+    .list-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 340px;
+      overflow-y: auto;
+      padding-right: 6px;
+      margin-bottom: 12px;
+    }
+    .list-item {
+      background: white;
+      border-radius: 30px;
+      padding: 10px 10px 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #eef2f6;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+      transition: all 0.15s;
+    }
+    .list-item:hover {
+      border-color: #baceec;
+    }
+    .item-text {
+      font-weight: 500;
+      color: #1e2e45;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .item-text i {
+      color: #1d3a5c;
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    .item-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .item-actions button {
+      border: none;
+      background: none;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .btn-edit {
+      background: #fef2e0;
+      color: #9d702e;
+    }
+    .btn-edit:hover { background: #fbe9cc; }
+    .btn-delete {
+      background: #ffe9e9;
+      color: #b14545;
+    }
+    .btn-delete:hover { background: #ffd9d9; }
+
+    /* login specific */
+    .login-field {
+      background: #f2f6fe;
+      border-radius: 30px;
+      padding: 6px 6px 6px 24px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .login-field input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 18px 8px 18px 0;
+      font-size: 16px;
+      outline: none;
+    }
+    .login-field i {
+      color: #5f7da0;
+      padding-right: 22px;
+    }
+    .login-btn {
+      background: #1d3a5c;
+      color: white;
+      border: none;
+      padding: 18px 24px;
+      border-radius: 40px;
+      font-size: 18px;
+      font-weight: 700;
+      width: 100%;
+      margin-top: 16px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px -8px #1a3752;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .small-note {
+      text-align: center;
+      margin-top: 32px;
+      color: #6c819e;
+      font-size: 14px;
+    }
+    .divider {
+      border-top: 2px dashed #dae3f2;
+      margin: 18px 0 12px 0;
+    }
+    /* hide spin */
+    input[type=number]::-webkit-inner-spin-button { opacity: 0; }
+  </style>
+</head>
+<body>
+
+<div class="app-screen" id="appScreen">
+  <!-- login panel (visible by default) -->
+  <div id="loginPanel">
+    <div class="app-header">
+      <h1><i class="fas fa-book-open"></i> DailyBook</h1>
+      <div class="greet"><i class="fas fa-smile"></i> start your day</div>
+    </div>
+    <div class="panel">
+      <div class="login-field">
+        <input type="text" id="nameInput" placeholder="Your name" autocomplete="off">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <div class="login-field">
+        <input type="number" id="mobileInput" placeholder="Mobile number">
+        <i class="fas fa-phone"></i>
+      </div>
+      <button class="login-btn" onclick="loginUser()"><i class="fas fa-arrow-right"></i> Continue</button>
+      <div class="small-note">✧ private & personal ✧</div>
+    </div>
+  </div>
+
+  <!-- main app panel (hidden initially) -->
+  <div id="mainPanel" style="display: none;">
+    <div class="app-header" style="padding-bottom: 14px;">
+      <div class="logout-wrap">
+        <div class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Log out</div>
+      </div>
+      <h1 style="font-size: 28px;"><i class="fas fa-pencil"></i> my entries</h1>
+      <div class="greet" id="welcomeText"></div>
+    </div>
+    <div class="panel">
+      <!-- entry input row -->
+      <div class="input-card">
+        <input type="text" id="entryInput" placeholder="Write something...">
+        <button onclick="addEntry()"><i class="fas fa-plus"></i> Add</button>
+      </div>
+      <!-- counter badge -->
+      <div class="stat-badge"><i class="fas fa-list-ul"></i> total entries · <b id="counter">0</b></div>
+      <!-- dynamic list -->
+      <ul class="list-items" id="entryList"></ul>
+      <div class="divider"></div>
+      <div class="small-note" style="margin-top: 8px;">← tap to edit or delete →</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK (modular) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // your config (unchanged)
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "dailybookrm.firebaseapp.com",
+    projectId: "dailybookrm",
+    storageBucket: "dailybookrm.firebasestorage.app",
+    messagingSenderId: "210497511348",
+    appId: "1:210497511348:web:a00be331fd355f45801ce1"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // DOM elements
+  const loginPanel = document.getElementById("loginPanel");
+  const mainPanel = document.getElementById("mainPanel");
+  const welcomeText = document.getElementById("welcomeText");
+  const entryInput = document.getElementById("entryInput");
+  const entryList = document.getElementById("entryList");
+  const counterSpan = document.getElementById("counter");
+
+  // state
+  let currentUserName = localStorage.getItem("db_name");
+  let currentUserMobile = localStorage.getItem("db_mobile");
+
+  // Firestore reference (will be set after login)
+  let entriesCollection;
+
+  // if already logged in, start directly
+  if (currentUserName && currentUserMobile) {
+    // BUT ensure mobile is string (localStorage saves as string)
+    startApp(currentUserName, currentUserMobile);
+  }
+
+  // make login function global (called from onclick)
+  window.loginUser = function() {
+    const name = document.getElementById("nameInput").value.trim();
+    const mobile = document.getElementById("mobileInput").value.trim();
+
+    if (!name || !mobile) {
+      alert("Please enter both name and mobile");
+      return;
+    }
+
+    // save to localStorage
+    localStorage.setItem("db_name", name);
+    localStorage.setItem("db_mobile", mobile);
+
+    // start app
+    startApp(name, mobile);
+  };
+
+  async function startApp(name, mobile) {
+    // update UI panels
+    loginPanel.style.display = "none";
+    mainPanel.style.display = "block";
+
+    welcomeText.innerHTML = `<i class="fas fa-hand-peace"></i> ${name}`;
+
+    // set collection reference (subcollection)
+    entriesCollection = collection(db, "dailyUsers", mobile, "entries");
+
+    // load entries from firestore
+    await loadEntries();
+  }
+
+  async function loadEntries() {
+    if (!entriesCollection) return;
+    try {
+      const querySnapshot = await getDocs(entriesCollection);
+      const total = querySnapshot.size;
+      counterSpan.innerText = total;
+
+      // clear list
+      entryList.innerHTML = "";
+
+      if (total === 0) {
+        // placeholder
+        const emptyLi = document.createElement("li");
+        emptyLi.className = "list-item";
+        emptyLi.style.justifyContent = "center";
+        emptyLi.style.background = "#f5f9ff";
+        emptyLi.innerHTML = `<span class="item-text"><i class="fas fa-chevron-right"></i> add first entry</span>`;
+        entryList.appendChild(emptyLi);
+        return;
+      }
+
+      // loop and create elements (safer, no inline onclick break)
+      querySnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const docId = docSnap.id;
+        const text = data.name || "entry";
+
+        const li = document.createElement("li");
+        li.className = "list-item";
+
+        // left side
+        const leftSpan = document.createElement("span");
+        leftSpan.className = "item-text";
+        leftSpan.innerHTML = `<i class="fas fa-circle" style="font-size: 6px;"></i> ${escapeHTML(text)}`;
+
+        // actions div
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "item-actions";
+
+        const editBtn = document.createElement("button");
+        editBtn.className = "btn-edit";
+        editBtn.innerHTML = '<i class="fas fa-edit"></i> edit';
+        editBtn.onclick = (e) => {
+          e.stopPropagation();
+          editEntry(docId, text);
+        };
+
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn-delete";
+        delBtn.innerHTML = '<i class="fas fa-trash-alt"></i> del';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteEntry(docId);
+        };
+
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(delBtn);
+        li.appendChild(leftSpan);
+        li.appendChild(actionsDiv);
+        entryList.appendChild(li);
+      });
+    } catch (error) {
+      console.warn("firestore error", error);
+      // if offline / no collection – still show empty
+    }
+  }
+
+  // simple escape
+  function escapeHTML(str) {
+    return String(str).replace(/[&<>"]/g, function(m){
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      if (m === '"') return '&quot;';
+      return m;
+    });
+  }
+
+  // add entry
+  window.addEntry = async function() {
+    const val = entryInput.value.trim();
+    if (!val) return;
+    if (!entriesCollection) {
+      alert("You need to login first");
+      return;
+    }
+    try {
+      await addDoc(entriesCollection, { name: val, createdAt: new Date() });
+      entryInput.value = "";
+      await loadEntries();
+    } catch (e) {
+      alert("Error saving (simulated if no firebase creds)");
+    }
+  };
+
+  // delete entry
+  window.deleteEntry = async function(id) {
+    if (!confirm("Delete this entry?")) return;
+    try {
+      await deleteDoc(doc(db, "dailyUsers", currentUserMobile, "entries", id));
+      await loadEntries();
+    } catch (e) {
+      alert("delete failed");
+    }
+  };
+
+  // edit entry
+  window.editEntry = async function(id, oldText) {
+    const newText = prompt("Edit entry", oldText);
+    if (!newText || newText.trim() === "") return;
+    try {
+      await updateDoc(doc(db, "dailyUsers", currentUserMobile, "entries", id), { name: newText.trim() });
+      await loadEntries();
+    } catch (e) {
+      alert("edit failed");
+    }
+  };
+
+  // LOGOUT FIXED: clear localStorage and reload, no half state
+  window.logoutUser = function() {
+    localStorage.clear();            // remove all items
+    // reset UI immediately without reload (smoother)
+    loginPanel.style.display = "block";
+    mainPanel.style.display = "none";
+    // clear input fields (optional)
+    document.getElementById("nameInput").value = "";
+    document.getElementById("mobileInput").value = "";
+    entryInput.value = "";
+    // reset collection
+    entriesCollection = null;
+    currentUserName = null;
+    currentUserMobile = null;
+    // optional: reload to be extra safe, but this works perfect.
+    // we do NOT reload, because design says "apps jaisa" -> smooth logout without refresh.
+    // but if you prefer reload (to clear all state) you can uncomment:
+    // location.reload(); 
+    // but I'm doing app-style: instant back to login, no reload.
+  };
+
+  // press enter on entry input
+  entryInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") addEntry();
+  });
+
+  // if firebase credentials missing, no crash – just silent.
+</script>
+<!-- fallback for very old browsers but fine -->
+<script>
+  // ensure logout (already defined in module, but double declaration doesn't hurt)
+  window.logoutUser = function() {
+    localStorage.clear();
+    document.getElementById('loginPanel').style.display = 'block';
+    document.getElementById('mainPanel').style.display = 'none';
+    // also clear fields
+    document.getElementById('nameInput').value = '';
+    document.getElementById('mobileInput').value = '';
+  };
+</script>
+</body>
+</html>
