@@ -1,554 +1,844 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="Pro.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Book</title>
-  <!-- Font & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="Pro.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Daily Routine · Firebase 3D</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
 
-    body {
-      background: #f0f4fe;  /* soft background like many modern apps */
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
+        :root {
+            --primary: #3498db;
+            --primary-dark: #217dbb;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --dark: #1e2a38;
+            --darker: #0b1a24;
+            --light: #ecf0f1;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-edge: rgba(255, 255, 255, 0.12);
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
 
-    /* main container — authentic app card with bottom bar feel */
-    .app-screen {
-      width: 100%;
-      max-width: 400px;  /* typical mobile width */
-      background: #ffffff;
-      border-radius: 40px 40px 30px 30px;
-      box-shadow: 0 30px 50px rgba(0, 10, 30, 0.15), 0 0 0 1px rgba(155, 180, 215, 0.3);
-      overflow: hidden;
-      backdrop-filter: blur(0);
-      transition: transform 0.2s;
-    }
+        body {
+            background: radial-gradient(circle at 10% 20%, #1c3b4f, #0b202b);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 16px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+        }
 
-    /* dynamic card content (used for both login / main) */
-    .panel {
-      padding: 28px 24px 34px 24px;
-      background: white;
-    }
+        .container {
+            width: 100%;
+            max-width: 520px;
+        }
 
-    /* header with gradient exactly like many ios/android apps */
-    .app-header {
-      background: linear-gradient(135deg, #0b2b44, #1f4b6e);
-      padding: 28px 24px 20px 24px;
-      color: white;
-    }
-    .app-header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      line-height: 1.1;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .app-header h1 i {
-      background: rgba(255,255,255,0.2);
-      padding: 10px;
-      border-radius: 18px;
-      font-size: 26px;
-    }
-    .app-header .greet {
-      font-size: 16px;
-      font-weight: 400;
-      opacity: 0.85;
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        /* 3D card style – refined */
+        .card-3d {
+            width: 100%;
+            margin: 0 auto 20px;
+            background: var(--glass);
+            backdrop-filter: blur(14px) saturate(180%);
+            padding: 24px 20px 28px;
+            border-radius: 42px;
+            box-shadow: 
+                0 30px 45px -20px rgba(0,0,0,0.6),
+                inset 0 1px 1px rgba(255,255,255,0.25),
+                0 0 0 1px rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            transform-style: preserve-3d;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* floating logout button inside header (clean) */
-    .logout-wrap {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 8px;
-    }
-    .logout-btn {
-      background: rgba(255,255,255,0.18);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: white;
-      padding: 8px 20px;
-      border-radius: 40px;
-      font-size: 15px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      backdrop-filter: blur(4px);
-      cursor: pointer;
-      transition: 0.15s;
-    }
-    .logout-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
+        .card-3d:hover {
+            transform: translateY(-6px) rotateX(3deg) scale(1.01);
+            box-shadow: 0 40px 60px -10px black, inset 0 1px 2px rgba(255,255,255,0.3);
+        }
 
-    /* modern input card style */
-    .input-card {
-      background: #f8faff;
-      border-radius: 28px;
-      padding: 8px 8px 8px 20px;
-      display: flex;
-      align-items: center;
-      margin: 24px 0 20px 0;
-      border: 1px solid #eef3fd;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-    }
-    .input-card input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 16px 8px 16px 0;
-      font-size: 16px;
-      font-weight: 500;
-      outline: none;
-    }
-    .input-card button {
-      background: #1d3a5c;
-      border: none;
-      color: white;
-      font-weight: 600;
-      padding: 14px 22px;
-      border-radius: 40px;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 18px -6px #0f2e4a;
-      cursor: pointer;
-      transition: 0.15s;
-      white-space: nowrap;
-    }
-    .input-card button i { font-size: 16px; }
-    .input-card button:hover { background: #264e78; }
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -60%;
+            width: 220%;
+            height: 220%;
+            background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.12) 40%, transparent 60%);
+            transform: rotate(25deg);
+            transition: 0.75s ease;
+            z-index: 1;
+        }
 
-    /* stats badge */
-    .stat-badge {
-      background: #ecf2fc;
-      border-radius: 60px;
-      padding: 12px 24px;
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 600;
-      color: #1d3853;
-      margin-bottom: 24px;
-      border: 1px solid white;
-      font-size: 15px;
-    }
-    .stat-badge i { color: #1f4b6e; }
+        .card-3d:hover::before {
+            left: 60%;
+            top: 60%;
+        }
 
-    /* list items — super clean, like notes app */
-    .list-items {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      max-height: 340px;
-      overflow-y: auto;
-      padding-right: 6px;
-      margin-bottom: 12px;
-    }
-    .list-item {
-      background: white;
-      border-radius: 30px;
-      padding: 10px 10px 10px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid #eef2f6;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.01);
-      transition: all 0.15s;
-    }
-    .list-item:hover {
-      border-color: #baceec;
-    }
-    .item-text {
-      font-weight: 500;
-      color: #1e2e45;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .item-text i {
-      color: #1d3a5c;
-      font-size: 10px;
-      opacity: 0.7;
-    }
-    .item-actions {
-      display: flex;
-      gap: 6px;
-    }
-    .item-actions button {
-      border: none;
-      background: none;
-      padding: 8px 18px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 14px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .btn-edit {
-      background: #fef2e0;
-      color: #9d702e;
-    }
-    .btn-edit:hover { background: #fbe9cc; }
-    .btn-delete {
-      background: #ffe9e9;
-      color: #b14545;
-    }
-    .btn-delete:hover { background: #ffd9d9; }
+        .card-content {
+            position: relative;
+            z-index: 3;
+        }
 
-    /* login specific */
-    .login-field {
-      background: #f2f6fe;
-      border-radius: 30px;
-      padding: 6px 6px 6px 24px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .login-field input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 18px 8px 18px 0;
-      font-size: 16px;
-      outline: none;
-    }
-    .login-field i {
-      color: #5f7da0;
-      padding-right: 22px;
-    }
-    .login-btn {
-      background: #1d3a5c;
-      color: white;
-      border: none;
-      padding: 18px 24px;
-      border-radius: 40px;
-      font-size: 18px;
-      font-weight: 700;
-      width: 100%;
-      margin-top: 16px;
-      cursor: pointer;
-      box-shadow: 0 10px 22px -8px #1a3752;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-    .small-note {
-      text-align: center;
-      margin-top: 32px;
-      color: #6c819e;
-      font-size: 14px;
-    }
-    .divider {
-      border-top: 2px dashed #dae3f2;
-      margin: 18px 0 12px 0;
-    }
-    /* hide spin */
-    input[type=number]::-webkit-inner-spin-button { opacity: 0; }
-  </style>
+        /* header with welcome + logout */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .welcome-badge {
+            background: rgba(255,215,0,0.2);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            font-size: 1.1rem;
+        }
+        .logout-icon {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+        .logout-icon:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        /* main dashboard menu buttons (large) */
+        .menu-btn {
+            background: linear-gradient(145deg, #2c5a7a, #1a4058);
+            border: none;
+            border-radius: 50px;
+            padding: 24px 20px;
+            margin: 20px 0;
+            width: 100%;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 15px 0 #0d2a38, 0 20px 30px black;
+            transition: 0.1s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .menu-btn:active {
+            transform: translateY(10px);
+            box-shadow: 0 5px 0 #0d2a38, 0 15px 25px black;
+        }
+
+        /* step indicator (inside panels) */
+        .step-indicator {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0 25px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 60px;
+            padding: 6px;
+        }
+        .step {
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: white;
+            background: rgba(255,255,255,0.08);
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 1rem;
+            border: none;
+            width: 50%;
+            text-transform: uppercase;
+        }
+        .step.active {
+            background: var(--primary);
+            box-shadow: 0 8px 18px -5px #1a5276;
+        }
+
+        /* bank/task items */
+        .bank-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px 18px;
+            margin: 14px 0;
+            border-radius: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: 0.2s;
+        }
+        .bank-item:hover {
+            transform: scale(1.01);
+            background: rgba(255,255,255,0.16);
+        }
+        .bank-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 0 2px 3px black;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bank-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .bank-actions input {
+            width: 100px;
+            padding: 12px 10px;
+            border-radius: 30px;
+            border: none;
+            background: rgba(255,255,255,0.95);
+            font-weight: 600;
+            color: #0d2d3a;
+            text-align: center;
+            font-size: 1rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 3D buttons */
+        .btn-3d {
+            padding: 14px 18px;
+            border: none;
+            border-radius: 44px;
+            margin: 10px 0;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            width: 100%;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.15s ease;
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.2), 0 10px 18px rgba(0,0,0,0.25);
+            outline: none;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-3d:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2), 0 7px 12px rgba(0,0,0,0.25);
+        }
+        .btn-blue { background: linear-gradient(145deg, #3a8bcb, #1f6692); color: white; }
+        .btn-green { background: linear-gradient(145deg, #2ecc71, #1e8f4b); color: white; }
+        .btn-orange { background: linear-gradient(145deg, #f39c12, #c96f0c); color: white; }
+        .btn-red { background: linear-gradient(145deg, #e74c3c, #a82313); color: white; }
+
+        .input-3d {
+            width: 100%;
+            padding: 18px 20px;
+            border-radius: 48px;
+            border: none;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 16px 0;
+            background: rgba(255,255,255,0.9);
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1), 0 6px 12px rgba(0,0,0,0.3);
+            color: #1e3b4b;
+            font-weight: 600;
+        }
+        .input-3d:focus {
+            outline: 3px solid var(--primary);
+            background: white;
+        }
+
+        .total-3d {
+            background: linear-gradient(145deg, #0097b1, #016b82);
+            padding: 22px;
+            border-radius: 38px;
+            margin: 24px 0 16px;
+            font-size: 1.9rem;
+            font-weight: 800;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 22px #005266, inset 0 2px 6px rgba(255,255,255,0.5);
+            text-shadow: 0 4px 5px #003f4d;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .back-btn {
+            display: block;
+            margin: 30px auto 10px;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            width: 160px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+            font-size: 1rem;
+        }
+        .back-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.04);
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes floatIn {
+            0% { opacity: 0; transform: translateY(30px) rotateX(-10deg); }
+            100% { opacity: 1; transform: translateY(0) rotateX(0); }
+        }
+        .fade-in { animation: floatIn 0.5s ease forwards; }
+
+        .task-cat-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 480px) {
+            .card-3d { padding: 20px 16px; }
+            .step { padding: 8px 12px; font-size: 0.9rem; }
+            .bank-actions input { width: 80px; padding: 10px; }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <!-- LOGIN CARD (visible by default) -->
+        <div class="card-3d fade-in" id="loginCard">
+            <div class="card-content">
+                <h1 class="title-3d"><i class="fas fa-compass"></i> Daily<span style="color:#ffd966;">Routine</span></h1>
+                <div class="login-field">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="loginName" placeholder="Your name" autocomplete="off">
+                </div>
+                <div class="login-field">
+                    <i class="fas fa-phone-alt"></i>
+                    <input type="number" id="loginMobile" placeholder="Mobile number">
+                </div>
+                <button class="btn-3d btn-blue" onclick="handleLogin()">
+                    <i class="fas fa-arrow-right"></i> Continue
+                </button>
+                <div style="text-align:center; margin-top:24px; opacity:0.7; font-size:0.95rem;">
+                    <i class="fas fa-database"></i> Firebase secured
+                </div>
+            </div>
+        </div>
 
-<div class="app-screen" id="appScreen">
-  <!-- login panel (visible by default) -->
-  <div id="loginPanel">
-    <div class="app-header">
-      <h1><i class="fas fa-book-open"></i> DailyBook</h1>
-      <div class="greet"><i class="fas fa-smile"></i> start your day</div>
+        <!-- DASHBOARD (visible after login) with two big menu buttons -->
+        <div class="card-3d hidden" id="dashboard">
+            <div class="card-content">
+                <!-- header with welcome + logout -->
+                <div class="dashboard-header">
+                    <span class="welcome-badge" id="welcomeMsg"><i class="fas fa-hand-peace"></i> User</span>
+                    <span class="logout-icon" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</span>
+                </div>
+
+                <!-- MAIN MENU BUTTONS (visible by default) -->
+                <div id="mainMenuButtons">
+                    <div class="menu-btn" onclick="showCashPanel()">
+                        <i class="fas fa-wallet"></i> Cash Counter
+                    </div>
+                    <div class="menu-btn" onclick="showTaskPanel()">
+                        <i class="fas fa-tasks"></i> Daily Task
+                    </div>
+                </div>
+
+                <!-- CASH PANEL (hidden initially) -->
+                <div id="cashPanel" class="hidden">
+                    <div class="step-indicator">
+                        <button class="step" id="cashStep1Btn" onclick="switchCashStep(1)">Banks</button>
+                        <button class="step" id="cashStep2Btn" onclick="switchCashStep(2)">+ Add</button>
+                    </div>
+                    <!-- STEP 1: view/edit banks -->
+                    <div id="cashStep1Panel">
+                        <div id="boxes"></div>
+                        <div class="total-3d">💰 ₹ <span id="total">0</span></div>
+                        <div class="action-buttons">
+                            <button class="btn-3d btn-orange" onclick="deleteBox()"><i class="fas fa-trash-alt"></i> Delete</button>
+                            <button class="btn-3d btn-red" onclick="resetAll()"><i class="fas fa-redo-alt"></i> Reset</button>
+                        </div>
+                    </div>
+                    <!-- STEP 2: add new bank -->
+                    <div id="cashStep2Panel" class="hidden">
+                        <div style="text-align: center;">
+                            <i class="fas fa-piggy-bank" style="font-size: 3.5rem; color: #ffdb8e;"></i>
+                            <h3 style="margin: 20px 0 10px; color:#fff;">Add New Bank</h3>
+                            <input type="text" id="newBankName" class="input-3d" placeholder="e.g. Credit Union" autocomplete="off">
+                            <button class="btn-3d btn-green" onclick="addBoxFromStep2()">
+                                <i class="fas fa-save"></i> Save Bank
+                            </button>
+                        </div>
+                    </div>
+                    <button class="back-btn" onclick="hideCashPanel()"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+
+                <!-- TASK PANEL (hidden initially) -->
+                <div id="taskPanel" class="hidden">
+                    <!-- category pills -->
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap;">
+                        <button class="btn-3d task-cat-btn" style="width: auto; padding: 10px 20px;" onclick="openCategory('iti')">🏭 ITI</button>
+                        <button class="btn-3d task-cat-btn" style="width: auto; padding: 10px 20px;" onclick="openCategory('home')">🏠 Home</button>
+                        <button class="btn-3d task-cat-btn" style="width: auto; padding: 10px 20px;" onclick="openCategory('pro')">💼 Pro Dev</button>
+                    </div>
+
+                    <div class="step-indicator">
+                        <button class="step" id="taskStep1Btn" onclick="switchTaskStep(1)">Tasks</button>
+                        <button class="step" id="taskStep2Btn" onclick="switchTaskStep(2)">+ Add</button>
+                    </div>
+
+                    <!-- STEP 1: list tasks -->
+                    <div id="taskStep1Panel">
+                        <h3 id="currentCategoryTitle" style="margin:10px 0 20px; color:#ffb570; text-align:center;">ITI Tasks</h3>
+                        <div id="taskList" style="min-height: 130px;"></div>
+                    </div>
+
+                    <!-- STEP 2: add new task -->
+                    <div id="taskStep2Panel" class="hidden">
+                        <div style="padding: 10px;">
+                            <label style="font-weight: 600; margin-left:8px;">New task for <span id="taskCategoryLabel">ITI</span></label>
+                            <input id="taskInput" class="input-3d" placeholder="e.g. study module 5">
+                            <button class="btn-3d btn-green" onclick="addCurrentTask()"><i class="fas fa-plus-circle"></i> Add Task</button>
+                        </div>
+                    </div>
+                    <button class="back-btn" onclick="hideTaskPanel()"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="panel">
-      <div class="login-field">
-        <input type="text" id="nameInput" placeholder="Your name" autocomplete="off">
-        <i class="fas fa-user-circle"></i>
-      </div>
-      <div class="login-field">
-        <input type="number" id="mobileInput" placeholder="Mobile number">
-        <i class="fas fa-phone"></i>
-      </div>
-      <button class="login-btn" onclick="loginUser()"><i class="fas fa-arrow-right"></i> Continue</button>
-      <div class="small-note">✧ private & personal ✧</div>
-    </div>
-  </div>
 
-  <!-- main app panel (hidden initially) -->
-  <div id="mainPanel" style="display: none;">
-    <div class="app-header" style="padding-bottom: 14px;">
-      <div class="logout-wrap">
-        <div class="logout-btn" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> Log out</div>
-      </div>
-      <h1 style="font-size: 28px;"><i class="fas fa-pencil"></i> my entries</h1>
-      <div class="greet" id="welcomeText"></div>
-    </div>
-    <div class="panel">
-      <!-- entry input row -->
-      <div class="input-card">
-        <input type="text" id="entryInput" placeholder="Write something...">
-        <button onclick="addEntry()"><i class="fas fa-plus"></i> Add</button>
-      </div>
-      <!-- counter badge -->
-      <div class="stat-badge"><i class="fas fa-list-ul"></i> total entries · <b id="counter">0</b></div>
-      <!-- dynamic list -->
-      <ul class="list-items" id="entryList"></ul>
-      <div class="divider"></div>
-      <div class="small-note" style="margin-top: 8px;">← tap to edit or delete →</div>
-    </div>
-  </div>
-</div>
+    <!-- Firebase SDK (modular) with error resilience -->
+    <script type="module">
+        // -------------------- FIREBASE CONFIG --------------------
+        // ⚠️ REPLACE "YOUR_API_KEY" with your actual Firebase API key from project settings
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<!-- Firebase SDK (modular) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  // your config (unchanged)
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "dailybookrm.firebaseapp.com",
-    projectId: "dailybookrm",
-    storageBucket: "dailybookrm.firebasestorage.app",
-    messagingSenderId: "210497511348",
-    appId: "1:210497511348:web:a00be331fd355f45801ce1"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // DOM elements
-  const loginPanel = document.getElementById("loginPanel");
-  const mainPanel = document.getElementById("mainPanel");
-  const welcomeText = document.getElementById("welcomeText");
-  const entryInput = document.getElementById("entryInput");
-  const entryList = document.getElementById("entryList");
-  const counterSpan = document.getElementById("counter");
-
-  // state
-  let currentUserName = localStorage.getItem("db_name");
-  let currentUserMobile = localStorage.getItem("db_mobile");
-
-  // Firestore reference (will be set after login)
-  let entriesCollection;
-
-  // if already logged in, start directly
-  if (currentUserName && currentUserMobile) {
-    // BUT ensure mobile is string (localStorage saves as string)
-    startApp(currentUserName, currentUserMobile);
-  }
-
-  // make login function global (called from onclick)
-  window.loginUser = function() {
-    const name = document.getElementById("nameInput").value.trim();
-    const mobile = document.getElementById("mobileInput").value.trim();
-
-    if (!name || !mobile) {
-      alert("Please enter both name and mobile");
-      return;
-    }
-
-    // save to localStorage
-    localStorage.setItem("db_name", name);
-    localStorage.setItem("db_mobile", mobile);
-
-    // start app
-    startApp(name, mobile);
-  };
-
-  async function startApp(name, mobile) {
-    // update UI panels
-    loginPanel.style.display = "none";
-    mainPanel.style.display = "block";
-
-    welcomeText.innerHTML = `<i class="fas fa-hand-peace"></i> ${name}`;
-
-    // set collection reference (subcollection)
-    entriesCollection = collection(db, "dailyUsers", mobile, "entries");
-
-    // load entries from firestore
-    await loadEntries();
-  }
-
-  async function loadEntries() {
-    if (!entriesCollection) return;
-    try {
-      const querySnapshot = await getDocs(entriesCollection);
-      const total = querySnapshot.size;
-      counterSpan.innerText = total;
-
-      // clear list
-      entryList.innerHTML = "";
-
-      if (total === 0) {
-        // placeholder
-        const emptyLi = document.createElement("li");
-        emptyLi.className = "list-item";
-        emptyLi.style.justifyContent = "center";
-        emptyLi.style.background = "#f5f9ff";
-        emptyLi.innerHTML = `<span class="item-text"><i class="fas fa-chevron-right"></i> add first entry</span>`;
-        entryList.appendChild(emptyLi);
-        return;
-      }
-
-      // loop and create elements (safer, no inline onclick break)
-      querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const docId = docSnap.id;
-        const text = data.name || "entry";
-
-        const li = document.createElement("li");
-        li.className = "list-item";
-
-        // left side
-        const leftSpan = document.createElement("span");
-        leftSpan.className = "item-text";
-        leftSpan.innerHTML = `<i class="fas fa-circle" style="font-size: 6px;"></i> ${escapeHTML(text)}`;
-
-        // actions div
-        const actionsDiv = document.createElement("div");
-        actionsDiv.className = "item-actions";
-
-        const editBtn = document.createElement("button");
-        editBtn.className = "btn-edit";
-        editBtn.innerHTML = '<i class="fas fa-edit"></i> edit';
-        editBtn.onclick = (e) => {
-          e.stopPropagation();
-          editEntry(docId, text);
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",          // <-- REPLACE THIS
+            authDomain: "dailybookrm.firebaseapp.com",
+            projectId: "dailybookrm",
+            storageBucket: "dailybookrm.firebasestorage.app",
+            messagingSenderId: "210497511348",
+            appId: "1:210497511348:web:a00be331fd355f45801ce1"
         };
 
-        const delBtn = document.createElement("button");
-        delBtn.className = "btn-delete";
-        delBtn.innerHTML = '<i class="fas fa-trash-alt"></i> del';
-        delBtn.onclick = (e) => {
-          e.stopPropagation();
-          deleteEntry(docId);
+        // Initialize Firebase (with error fallback to avoid crashes)
+        let db = null;
+        let firebaseAvailable = true;
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+        } catch (e) {
+            console.warn("Firebase init failed, using offline mode (no sync)", e);
+            firebaseAvailable = false;
+        }
+
+        // ---------- GLOBAL STATE ----------
+        window.currentUserMobile = localStorage.getItem("routine_mobile");
+        window.currentUserName = localStorage.getItem("routine_name");
+        window.routineData = null;          // in-memory cache { cash, tasksITI, tasksHome, tasksPro }
+        window.routineDocRef = null;
+
+        // DOM elements
+        const loginCard = document.getElementById('loginCard');
+        const dashboard = document.getElementById('dashboard');
+        const welcomeMsg = document.getElementById('welcomeMsg');
+        const mainMenuButtons = document.getElementById('mainMenuButtons');
+        const cashPanel = document.getElementById('cashPanel');
+        const taskPanel = document.getElementById('taskPanel');
+
+        // Helper to get document reference
+        function getRoutineRef(mobile) {
+            return doc(db, "dailyUsers", mobile, "routine", "userData");
+        }
+
+        // Load from Firestore (or create default) – returns promise
+        async function loadRoutine(mobile) {
+            if (!db || !firebaseAvailable) {
+                // offline fallback: use localStorage or default
+                let saved = localStorage.getItem(`routine_offline_${mobile}`);
+                if (saved) {
+                    window.routineData = JSON.parse(saved);
+                } else {
+                    window.routineData = {
+                        cash: [{ name: "Bank Account", amount: 0 }, { name: "UPI Wallet", amount: 0 }, { name: "Cash", amount: 0 }, { name: "Savings", amount: 0 }],
+                        tasksITI: [],
+                        tasksHome: [],
+                        tasksPro: []
+                    };
+                }
+                return window.routineData;
+            }
+            try {
+                const ref = getRoutineRef(mobile);
+                const snap = await getDoc(ref);
+                if (snap.exists()) {
+                    window.routineData = snap.data();
+                } else {
+                    window.routineData = {
+                        cash: [{ name: "Bank Account", amount: 0 }, { name: "UPI Wallet", amount: 0 }, { name: "Cash", amount: 0 }, { name: "Savings", amount: 0 }],
+                        tasksITI: [],
+                        tasksHome: [],
+                        tasksPro: []
+                    };
+                    await setDoc(ref, window.routineData);
+                }
+                window.routineDocRef = ref;
+                return window.routineData;
+            } catch (e) {
+                alert("Firestore error, using offline defaults. Check your API key.");
+                console.error(e);
+                // fallback defaults
+                window.routineData = {
+                    cash: [{ name: "Bank Account", amount: 0 }, { name: "UPI Wallet", amount: 0 }, { name: "Cash", amount: 0 }, { name: "Savings", amount: 0 }],
+                    tasksITI: [],
+                    tasksHome: [],
+                    tasksPro: []
+                };
+                return window.routineData;
+            }
+        }
+
+        // Save current routineData to Firestore (or localStorage fallback)
+        async function saveRoutine() {
+            if (!window.routineData) return;
+            const mobile = window.currentUserMobile;
+            if (!mobile) return;
+
+            if (!db || !firebaseAvailable) {
+                // offline: store in localStorage
+                localStorage.setItem(`routine_offline_${mobile}`, JSON.stringify(window.routineData));
+                return;
+            }
+            try {
+                if (!window.routineDocRef) {
+                    window.routineDocRef = getRoutineRef(mobile);
+                }
+                await updateDoc(window.routineDocRef, window.routineData);
+            } catch (e) {
+                console.warn("Save failed, cached only", e);
+            }
+        }
+
+        // ---------- LOGIN / LOGOUT ----------
+        window.handleLogin = async function() {
+            const name = document.getElementById('loginName').value.trim();
+            const mobile = document.getElementById('loginMobile').value.trim();
+            if (!name || !mobile) {
+                alert("Please enter both name and mobile");
+                return;
+            }
+            localStorage.setItem("routine_name", name);
+            localStorage.setItem("routine_mobile", mobile);
+            window.currentUserName = name;
+            window.currentUserMobile = mobile;
+
+            await loadRoutine(mobile);
+
+            loginCard.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+            welcomeMsg.innerHTML = `<i class="fas fa-hand-peace"></i> ${name}`;
+
+            // Show main menu, hide panels
+            mainMenuButtons.classList.remove('hidden');
+            cashPanel.classList.add('hidden');
+            taskPanel.classList.add('hidden');
         };
 
-        actionsDiv.appendChild(editBtn);
-        actionsDiv.appendChild(delBtn);
-        li.appendChild(leftSpan);
-        li.appendChild(actionsDiv);
-        entryList.appendChild(li);
-      });
-    } catch (error) {
-      console.warn("firestore error", error);
-      // if offline / no collection – still show empty
-    }
-  }
+        window.logout = function() {
+            localStorage.removeItem("routine_name");
+            localStorage.removeItem("routine_mobile");
+            window.currentUserMobile = null;
+            window.currentUserName = null;
+            window.routineData = null;
+            window.routineDocRef = null;
 
-  // simple escape
-  function escapeHTML(str) {
-    return String(str).replace(/[&<>"]/g, function(m){
-      if (m === '&') return '&amp;';
-      if (m === '<') return '&lt;';
-      if (m === '>') return '&gt;';
-      if (m === '"') return '&quot;';
-      return m;
-    });
-  }
+            loginCard.classList.remove('hidden');
+            dashboard.classList.add('hidden');
+            document.getElementById('loginName').value = '';
+            document.getElementById('loginMobile').value = '';
+        };
 
-  // add entry
-  window.addEntry = async function() {
-    const val = entryInput.value.trim();
-    if (!val) return;
-    if (!entriesCollection) {
-      alert("You need to login first");
-      return;
-    }
-    try {
-      await addDoc(entriesCollection, { name: val, createdAt: new Date() });
-      entryInput.value = "";
-      await loadEntries();
-    } catch (e) {
-      alert("Error saving (simulated if no firebase creds)");
-    }
-  };
+        // Auto-login if stored
+        if (window.currentUserMobile && window.currentUserName) {
+            (async () => {
+                await loadRoutine(window.currentUserMobile);
+                loginCard.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                welcomeMsg.innerHTML = `<i class="fas fa-hand-peace"></i> ${window.currentUserName}`;
+                mainMenuButtons.classList.remove('hidden');
+                cashPanel.classList.add('hidden');
+                taskPanel.classList.add('hidden');
+            })();
+        }
 
-  // delete entry
-  window.deleteEntry = async function(id) {
-    if (!confirm("Delete this entry?")) return;
-    try {
-      await deleteDoc(doc(db, "dailyUsers", currentUserMobile, "entries", id));
-      await loadEntries();
-    } catch (e) {
-      alert("delete failed");
-    }
-  };
+        // ---------- SHOW/HIDE PANELS ----------
+        window.showCashPanel = function() {
+            mainMenuButtons.classList.add('hidden');
+            cashPanel.classList.remove('hidden');
+            taskPanel.classList.add('hidden');
+            switchCashStep(1);
+            renderCash();
+        };
 
-  // edit entry
-  window.editEntry = async function(id, oldText) {
-    const newText = prompt("Edit entry", oldText);
-    if (!newText || newText.trim() === "") return;
-    try {
-      await updateDoc(doc(db, "dailyUsers", currentUserMobile, "entries", id), { name: newText.trim() });
-      await loadEntries();
-    } catch (e) {
-      alert("edit failed");
-    }
-  };
+        window.hideCashPanel = function() {
+            cashPanel.classList.add('hidden');
+            mainMenuButtons.classList.remove('hidden');
+        };
 
-  // LOGOUT FIXED: clear localStorage and reload, no half state
-  window.logoutUser = function() {
-    localStorage.clear();            // remove all items
-    // reset UI immediately without reload (smoother)
-    loginPanel.style.display = "block";
-    mainPanel.style.display = "none";
-    // clear input fields (optional)
-    document.getElementById("nameInput").value = "";
-    document.getElementById("mobileInput").value = "";
-    entryInput.value = "";
-    // reset collection
-    entriesCollection = null;
-    currentUserName = null;
-    currentUserMobile = null;
-    // optional: reload to be extra safe, but this works perfect.
-    // we do NOT reload, because design says "apps jaisa" -> smooth logout without refresh.
-    // but if you prefer reload (to clear all state) you can uncomment:
-    // location.reload(); 
-    // but I'm doing app-style: instant back to login, no reload.
-  };
+        window.showTaskPanel = function() {
+            mainMenuButtons.classList.add('hidden');
+            taskPanel.classList.remove('hidden');
+            cashPanel.classList.add('hidden');
+            window.currentCategory = 'iti';
+            openCategory('iti');
+            switchTaskStep(1);
+        };
 
-  // press enter on entry input
-  entryInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") addEntry();
-  });
+        window.hideTaskPanel = function() {
+            taskPanel.classList.add('hidden');
+            mainMenuButtons.classList.remove('hidden');
+        };
 
-  // if firebase credentials missing, no crash – just silent.
-</script>
-<!-- fallback for very old browsers but fine -->
-<script>
-  // ensure logout (already defined in module, but double declaration doesn't hurt)
-  window.logoutUser = function() {
-    localStorage.clear();
-    document.getElementById('loginPanel').style.display = 'block';
-    document.getElementById('mainPanel').style.display = 'none';
-    // also clear fields
-    document.getElementById('nameInput').value = '';
-    document.getElementById('mobileInput').value = '';
-  };
-</script>
+        // ---------- CASH FUNCTIONS ----------
+        window.renderCash = function() {
+            if (!window.routineData) return;
+            const container = document.getElementById('boxes');
+            if (!container) return;
+            container.innerHTML = "";
+            let total = 0;
+            window.routineData.cash.forEach((item, idx) => {
+                total += Number(item.amount);
+                container.innerHTML += `
+                    <div class="bank-item">
+                        <div class="bank-name"><i class="fas fa-university"></i> ${item.name}</div>
+                        <div class="bank-actions">
+                            <input type="number" value="${item.amount}" oninput="updateCash(${idx}, this.value)" placeholder="₹">
+                            <button onclick="editBox(${idx})" style="background:#3498db; color:white; border:none; border-radius:30px; padding:10px 14px;"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('total').innerText = total;
+        };
+
+        window.updateCash = function(idx, val) {
+            if (!window.routineData) return;
+            window.routineData.cash[idx].amount = val ? Number(val) : 0;
+            let total = 0;
+            window.routineData.cash.forEach(i => total += Number(i.amount));
+            document.getElementById('total').innerText = total;
+            saveRoutine();
+        };
+
+        window.editBox = function(idx) {
+            const newName = prompt("Edit bank name", window.routineData.cash[idx].name);
+            if (newName && newName.trim() !== "") {
+                window.routineData.cash[idx].name = newName.trim();
+                renderCash();
+                saveRoutine();
+            }
+        };
+
+        window.addBoxFromStep2 = function() {
+            const inp = document.getElementById('newBankName');
+            const name = inp.value.trim();
+            if (!name) return alert("Enter a bank name");
+            window.routineData.cash.push({ name, amount: 0 });
+            inp.value = "";
+            saveRoutine().then(() => {
+                renderCash();
+                switchCashStep(1);
+            });
+        };
+
+        window.deleteBox = function() {
+            if (!window.routineData.cash.length) return alert("No banks to delete");
+            let list = "Select bank to delete (enter number or name):\n";
+            window.routineData.cash.forEach((item,i) => list += `${i+1}. ${item.name}\n`);
+            const choice = prompt(list);
+            if (!choice) return;
+            const index = parseInt(choice) - 1;
+            if (!isNaN(index) && index >=0 && index < window.routineData.cash.length) {
+                if (confirm(`Delete ${window.routineData.cash[index].name}?`)) {
+                    window.routineData.cash.splice(index, 1);
+                    saveRoutine().then(() => renderCash());
+                }
+            } else {
+                const filtered = window.routineData.cash.filter(item => item.name.toLowerCase() !== choice.toLowerCase().trim());
+                if (filtered.length !== window.routineData.cash.length) {
+                    window.routineData.cash = filtered;
+                    saveRoutine().then(() => renderCash());
+                }
+            }
+        };
+
+        window.resetAll = function() {
+            if (confirm("Set all amounts to zero?")) {
+                window.routineData.cash.forEach(item => item.amount = 0);
+                saveRoutine().then(() => renderCash());
+            }
+        };
+
+        window.switchCashStep = function(step) {
+            const p1 = document.getElementById('cashStep1Panel');
+            const p2 = document.getElementById('cashStep2Panel');
+            const btn1 = document.getElementById('cashStep1Btn');
+            const btn2 = document.getElementById('cashStep2Btn');
+            if (step === 1) {
+                p1.classList.remove('hidden');
+                p2.classList.add('hidden');
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+                renderCash();
+            } else {
+                p1.classList.add('hidden');
+                p2.classList.remove('hidden');
+                btn1.classList.remove('active');
+                btn2.classList.add('active');
+                document.getElementById('newBankName')?.focus();
+            }
+        };
+
+        // ---------- TASK FUNCTIONS ----------
+        window.currentCategory = 'iti';
+
+        window.openCategory = function(cat) {
+            window.currentCategory = cat;
+            const title = document.getElementById('currentCategoryTitle');
+            let display = cat === 'iti' ? 'ITI' : (cat === 'home' ? 'HOME' : 'PRO DEV');
+            title.innerText = display + ' Tasks';
+            document.getElementById('taskCategoryLabel').innerText = cat.toUpperCase();
+            loadTasksForCurrent();
+        };
+
+        function getTaskArray(cat) {
+            if (!window.routineData) return [];
+            if (cat === 'iti') return window.routineData.tasksITI || [];
+            if (cat === 'home') return window.routineData.tasksHome || [];
+            return window.routineData.tasksPro || [];
+        }
+        function setTaskArray(cat, arr) {
+            if (!window.routineData) return;
+            if (cat === 'iti') window.routineData.tasksITI = arr;
+            else if (cat === 'home') window.routineData.tasksHome = arr;
+            else window.routineData.tasksPro = arr;
+        }
+
+        window.loadTasksForCurrent = function() {
+            if (!window.routineData) return;
+            const tasks = getTaskArray(window.currentCategory);
+            const listDiv = document.getElementById('taskList');
+            listDiv.innerHTML = "";
+            if (!tasks.length) {
+                listDiv.innerHTML = '<p style="text-align:center; padding:30px; opacity:0.7;">✨ No tasks — add some ✨</p>';
+                return;
+            }
+            tasks.forEach((task, idx) => {
+                listDiv.innerHTML += `
+                    <div class="bank-item">
+                        <span><i class="fas fa-check-circle" style="color:#a5d6a5;"></i> ${task}</span>
+                        <div>
+                            <button onclick="editTask('${window.currentCategory}', ${idx})" style="background:#3498db; border:none; border-radius:30px; padding:8px 16px; color:white;"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteTask('${window.currentCategory}', ${idx})" style="background:#e74c3c; border:none; border-radius:30px; padding:8px 16px; color:white;"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.addCurrentTask = function() {
+            const input = document.getElementById('taskInput');
+            const task = input.value.trim();
+            if (!task) return;
+            const cat = window.currentCategory;
+            const arr = getTaskArray(cat);
+            arr.push(task);
+            setTaskArray(cat, arr);
+            input.value = "";
+            saveRoutine().then(() => {
+                loadTasksForCurrent();
+                switchTaskStep(1);
+            });
+        };
+
+        window.editTask = function(cat, idx) {
+            const arr = getTaskArray(cat);
+            const newText = prompt("Edit task:", arr[idx]);
+            if (newText && newText.trim() !== "") {
+                arr[idx] = newText.trim();
+                setTaskArray(cat, arr);
+                saveRoutine().then(() => {
+                    if (cat === window.currentCategory) loadTasksForCurrent();
+                });
+            }
+        };
+
+        window.deleteTask = function(cat, idx) {
+            if (!confirm("Delete task?")) return;
+            const arr = getTaskArray(cat);
+            arr.splice(idx, 1);
+            setTaskArray(cat, arr);
+            saveRoutine().then(() => {
+                if (cat === window.currentCategory) loadTasksForCurrent();
+            });
+        };
+
+        window.switchTaskStep = function(step) {
+            const p1 = document.getElementById('taskStep1Panel');
+            const p2 = document.getElementById('taskStep2Panel');
+            const btn1 = document.getElementById('taskStep1Btn');
+            const btn2 = document.getElementById('taskStep2Btn');
+            if (step === 1) {
+                p1.classList.remove('hidden');
+                p2.classList.add('hidden');
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+                loadTasksForCurrent();
+            } else {
+                p1.classList.add('hidden');
+                p2.classList.remove('hidden');
+                btn1.classList.remove('active');
+                btn2.classList.add('active');
+                document.getElementById('taskInput')?.focus();
+                document.getElementById('taskCategoryLabel').innerText = window.currentCategory.toUpperCase();
+            }
+        };
+
+        // initial active states
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('cashStep1Btn')) document.getElementById('cashStep1Btn').classList.add('active');
+            if (document.getElementById('taskStep1Btn')) document.getElementById('taskStep1Btn').classList.add('active');
+        });
+    </script>
 </body>
-</html>
+</html>       
